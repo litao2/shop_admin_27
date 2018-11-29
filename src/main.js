@@ -5,6 +5,11 @@ import App from './App'
 
 // 导入自己封装的路由模块
 import router from './router'
+// 导入ElementUI
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+// 安装ElementUI插件
+Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
