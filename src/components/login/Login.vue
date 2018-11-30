@@ -30,7 +30,10 @@
       label="密码"
       prop="password"
     >
-      <el-input v-model="loginForm.password"></el-input>
+      <el-input
+        type="password"
+        v-model="loginForm.password"
+      ></el-input>
     </el-form-item>
 
     <el-form-item>
@@ -45,20 +48,23 @@
 </template>
 
 <script>
+// 导入axios
+import axios from 'axios'
+
 export default {
   data () {
     return {
       loginForm: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: '123456'
       },
       rules: {
         username: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur' }
         ]
       }
@@ -76,6 +82,32 @@ export default {
         if (!valid) {
           return false
         }
+
+        // 效验成功
+        // 发送请求到登录接口，完成登录
+        axios
+          .post('http://localhost:8888/api/private/v1/login', this.loginForm)
+          .then(res => {
+            // console.log('登录结果：', res)
+            if (res.data.meta.status === 200) {
+              // 登录成功，跳转到后台首页
+              // 通过编程式导航实现路由跳转
+              // push 方法的参数为：要跳转到的页面路径，与路由规则中的path匹配
+              this.$router.push('/home')
+              this.$message({
+                message: res.data.meta.msg,
+                type: 'success',
+                duration: 800
+              })
+            } else {
+              // 登录失败
+              this.$message({
+                message: res.data.meta.msg,
+                type: 'error',
+                duration: 1000
+              })
+            }
+          })
       })
     },
     resetForm (formName) {
