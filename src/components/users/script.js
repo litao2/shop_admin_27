@@ -9,6 +9,8 @@ const MOBILE_GER = /^1(3|4|5|7|8)\d{9}$/
 export default {
   created () {
     this.getUserList()
+    // 获取角色列表数据
+    this.getRolesList()
   },
   data () {
     return {
@@ -57,7 +59,16 @@ export default {
         email: '',
         mobile: ''
       },
-      userEditDailog: false
+      userEditDailog: false,
+
+      // 分配角色数据
+      // 控制分配角色对话框的展示和隐藏
+      isShowUserRole: false,
+      userRoleForm: {
+        username: '',
+        rid: ''
+      },
+      userRoleList: []
     }
   },
 
@@ -242,6 +253,46 @@ export default {
           message: meta.msg
         })
       }
+    },
+    /**
+     * 展示给用户分配角色对话框
+     * @param {object} curUser 当前用户对象
+     */
+    async showUserRole (curUser) {
+      // 1.展示分配角色对话框
+      this.isShowUserRole = true
+
+      const res = await this.$http.get(`/users/${curUser.id}`)
+      let { rid } = res.data.data
+      rid = rid === -1 ? '' : rid
+      // 2.显示当前用户的名称和角色id
+      this.userRoleForm.username = curUser.username
+      this.userRoleForm.rid = rid
+      // 3.暂存用户id
+      this.userRoleForm.userid = curUser.id
+    },
+    /**
+     * 获取角色列表数据
+     */
+    async getRolesList () {
+      const res = await this.$http.get('/roles')
+      this.userRoleList = res.data.data
+    },
+    // 分配角色给用户
+    async assignRole () {
+      const {userid, rid} = this.userRoleForm
+      const res = await this.$http.put(`/users/${userid}/role`, {
+        rid
+      })
+      // 关闭对话框
+      this.isShowUserRole = false
+      // 刷新列表数据
+      this.getUserList(1, this.searchText)
+      // 提示用户成功
+      this.$message({
+        type: 'success',
+        message: res.data.meta.msg
+      })
     }
   }
 }
