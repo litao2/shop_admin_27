@@ -1,0 +1,110 @@
+<div class="users">
+  <!-- 面包屑导航 -->
+  <el-breadcrumb class="users-bread" separator-class="el-icon-arrow-right">
+    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+    <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+    <el-breadcrumb-item>用户列表</el-breadcrumb-item>
+  </el-breadcrumb>
+
+  <el-row :gutter="20">
+    <el-col :span="6">
+      <el-input placeholder="请输入搜索内容" v-model="searchText" class="input-with-select">
+        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+      </el-input>
+    </el-col>
+    <el-col :span="4">
+      <!-- 添加按钮 -->
+      <el-button type="success" plain @click="showUserAddDialog">添加用户</el-button>
+    </el-col>
+  </el-row>
+
+  <!--
+    列表：
+      el-table 表格组件
+        :data 用来指定表格数据源（数组）
+
+      el-table-column 用来设置每一列的表头
+        prop 对应列内容的字段名，就是 data 数组中每一项对象中的键
+        label 表格每一列的描述文字
+        width 对应列的宽度
+  -->
+  <el-table :data="usersList" style="width: 100%">
+    <el-table-column prop="username" label="姓名" width="180">
+    </el-table-column>
+    <el-table-column prop="email" label="邮箱" width="180">
+    </el-table-column>
+    <el-table-column prop="mobile" label="电话">
+    </el-table-column>
+    </el-table-column>
+    <el-table-column prop="mg_state" label="用户状态">
+      <template slot-scope="scope">
+        <!-- scope.row.mg_state就是当前行的用户状态数据 -->
+        <el-switch v-model="scope.row.mg_state" @change="changeUserState(scope.row)">
+        </el-switch>
+      </template>
+    </el-table-column>
+    </el-table-column>
+    <el-table-column label="操作">
+      <template slot-scope="scope">
+        <!-- 修改 -->
+        <el-button type="primary" size="mini" plain icon="el-icon-edit" @click="showEditUserDialog(scope.row)"></el-button>
+        <!-- 删除 -->
+        <el-button type="danger" size="mini" plain icon="el-icon-delete" @click="delUser(scope.row.id)"></el-button>
+        <!-- 分配角色 -->
+        <el-button type="success" size="mini" plain icon="el-icon-check">分配角色</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
+
+  <!-- 分页组件
+      background 背景颜色
+      layout 页面组件结构
+      total 总条数
+  -->
+  <el-pagination background layout="prev, pager, next" :total="total" :page-size="pagesize" :current-page="pagenum"
+    @current-change=changePage>
+  </el-pagination>
+
+  <!-- 添加用户 -->
+  <el-dialog title="添加用户" :visible.sync="dialogFormVisible" @close="closeUserAddDialog">
+    <el-form :model="userAddForm" :rules="userAddRules" ref="userAddForm">
+      <el-form-item label="用户名称" prop="username" :label-width="formLabelWidth">
+        <el-input v-model="userAddForm.username"></el-input>
+      </el-form-item>
+      <el-form-item label="密码" prop="password"  :label-width="formLabelWidth">
+        <el-input v-model="userAddForm.password" type="password"></el-input>
+      </el-form-item>
+      <el-form-item label="邮箱"  prop="email" :label-width="formLabelWidth">
+        <el-input v-model="userAddForm.email"></el-input>
+      </el-form-item>
+      <el-form-item label="手机"  prop="mobile" :label-width="formLabelWidth">
+        <el-input v-model="userAddForm.mobile"></el-input>
+      </el-form-item>
+
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="dialogFormVisible = false">取 消</el-button>
+      <el-button type="primary" @click="addUser">确 定</el-button>
+    </div>
+  </el-dialog>
+
+  <!-- 编辑用户 -->
+  <el-dialog title="编辑用户" :visible.sync="userEditDailog" >
+    <el-form :model="userEditForm" ref="userEditForm">
+      <el-form-item label="用户名" :label-width="formLabelWidth">
+          <el-tag type="info">{{ userEditForm.username }}</el-tag>
+      </el-form-item>
+      <el-form-item label="邮箱" :label-width="formLabelWidth">
+        <el-input v-model="userEditForm.email"></el-input>
+      </el-form-item>
+      <el-form-item label="手机" :label-width="formLabelWidth">
+        <el-input v-model="userEditForm.mobile"></el-input>
+      </el-form-item>
+
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="userEditDailog = false">取 消</el-button>
+      <el-button type="primary" @click="editUser">确 定</el-button>
+    </div>
+  </el-dialog>
+</div>

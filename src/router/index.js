@@ -6,6 +6,11 @@ import Router from 'vue-router'
 // 导入创建好的两个单文件组件
 import Login from '@/components/login/Login'
 import Home from '@/components/home/Home'
+import Users from '@/components/users/Users'
+import Roles from '@/components/roles/Roles'
+
+// 导入权限列表组件
+import Rights from '@/components/rights/Rights'
 
 // 将路由通过use注册到vue中
 Vue.use(Router)
@@ -14,7 +19,15 @@ Vue.use(Router)
 const router = new Router({
   routes: [
     { path: '/login', component: Login },
-    { path: '/home', component: Home }
+    {
+      path: '/home',
+      component: Home,
+      children: [
+        { path: '/users', component: Users },
+        { path: '/roles', component: Roles },
+        { path: '/rights', component: Rights }
+      ]
+    }
   ]
 })
 
@@ -23,8 +36,7 @@ router.beforeEach((to, from, next) => {
   // 思路：
   // 1.如果访问的是登录页，直接展示登录页面
   if (to.path === '/login') {
-    next()
-    return
+    return next()
   }
   // 2.判断有没有登录
   const token = localStorage.getItem('token')
@@ -38,11 +50,11 @@ router.beforeEach((to, from, next) => {
   // from 表示从哪来，也就是：当前要离开的路由
   // to 表示到哪去，也就是：要进入的路由
   // next() 一定要调用这个钩子函数，否则页面不会展示任何内容
-  console.log('导航守卫执行了')
-  console.log('to:', to)
-  console.log('from:', from)
+  // console.log('导航守卫执行了')
+  // console.log('to:', to)
+  // console.log('from:', from)
 
-  next()
+  // next()
 })
 // 导出路由
 export default router
